@@ -79,6 +79,12 @@ def to_c_list(string):
 	ckey = ckey[:-2] + "}"
 	return ckey
 
+def ascii_printable(string):
+	for char in string:
+		if ord(char) < 33 or ord(char) > 126:
+			return "Not available"
+	return string
+
 def main():
 	parser = OptionParser()
 	parser.add_option("-i", "--input", action="store", dest="inputfile", help="path to input file", metavar="FILE")
@@ -89,7 +95,7 @@ def main():
 	
 	(magic, enc_uimage, enc_key) = read_firmware(options.inputfile)
 	key = get_key(knownstring, enc_key)
-	print "Magic:\t\t0x" + to_hex(magic) + " (ASCII: " + magic + ")"
+	print "Magic:\t\t0x" + to_hex(magic) + " (ASCII: " + ascii_printable(magic) + ")"
 	print "Key:\t\t" + to_c_list(key)
 	print "Validity:\t",
 	valid = check_uimage_header(enc_uimage, key)
