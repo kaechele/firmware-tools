@@ -24,6 +24,7 @@
 #  
 #  
 from optparse import OptionParser
+from magic import signatures
 
 # String: "Linux Kernel Image"
 knownstring = ['\x4c', '\x69', '\x6e', '\x75', '\x78', '\x20', '\x4b', '\x65', '\x72', '\x6e', '\x65', '\x6c', '\x20', '\x49', '\x6d', '\x61', '\x67', '\x65']
@@ -31,22 +32,22 @@ uimage_header = ['\x27', '\x05', '\x19', '\x56']
 
 def read_firmware(inputfile):
 	f = open(inputfile, 'r')
-	
+
 	# Get image magic
 	pos = f.seek(0, 0)
 	fstr = f.read(4)
 	magic = fstr[3] + fstr[2] + fstr[1] + fstr[0]
-	
+
 	# Get encoded uImage header
 	pos = f.seek(28, 0)
 	fstr = f.read(4)
 	enc_uimage = fstr
-	
+
 	# Get encoded known string (usually located at offset 60 (0x3C))
 	pos = f.seek(60, 0)
 	fstr = f.read(18)
 	enc_key = fstr
-	
+
 	return magic, enc_uimage, enc_key
 
 def get_key(knownstring, enc_key):
@@ -60,6 +61,12 @@ def check_uimage_header(enc_uimage, key):
 	for i, v in enumerate(enc_uimage):
 		test[i] = chr(ord(enc_uimage[i]) ^ ord(key[i]))
 	return test == uimage_header
+
+def get_known_devices(magic):
+	if signatures.has_key(magic):
+		return signatures[magic]
+	else:
+		return []
 
 def to_hex(string):
 	return "".join([hex(ord(c))[2:].zfill(2) for c in string])
@@ -85,11 +92,19 @@ def main():
 	print "Magic:\t\t0x" + to_hex(magic) + " (ASCII: " + magic + ")"
 	print "Key:\t\t" + to_c_list(key)
 	print "Validity:\t",
-	if check_uimage_header(enc_uimage, key):
+	valid = check_uimage_header(enc_uimage, key)
+	if valid:
 		print "Header looks like uImage. Key valid!"
 	else:
 		print "Header doesn't look like uImage. Key invalid!"
-	
+
+	devices = get_known_devices(magic)
+	if len(devices) > 0:
+		print "\nThis firmware is known to be used in the following devices:"
+		for device in devices:
+			print "  - " + device
+	elif valid:
+		print "\nThe image comes from an unknown device. Please contact the authors to have the device added."
 	return 0
 
 if __name__ == '__main__':
