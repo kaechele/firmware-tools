@@ -27,6 +27,10 @@ signatures = {
 	'1503': ['Poray R50B',
 		 'SouthRiver Products SR-PRP-R50B'],
 	'1535': ['Poray M3'],
+	'2350': ['NEXX WT1520F',
+          'NEXX WT1510F',
+          'NEXX 1520H',
+          'NEXX WT3020'],
 	'2535': ['Poray M4',
 		 'SouthRiver Products SR-PRP-M4'],
 	'2G3R': ['MPR-L8'],
@@ -40,6 +44,7 @@ signatures = {
 		 'HOTSION HOT-V9'],
 	'6535': ['Poray X8'],
 	'8535': ['Poray X1'],
+	'R3G2': ['Neewer 150M'],
 	'SG3R': ['DX.com SKU#45639',
 		 'Conrad UMTS 3G WLAN-Router N150'],
 	}
